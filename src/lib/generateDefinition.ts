@@ -433,7 +433,7 @@ async function extenderOnOffLight(device: Zh.Device, endpoints: Zh.Endpoint[]): 
             multiEndpointSkip.push("color_mode", "", "color_options");
         }
 
-        if (endpoint.getDevice().manufacturerID === Zcl.ManufacturerCode.SIGNIFY_NETHERLANDS_B_V) {
+        if (device.manufacturerID === Zcl.ManufacturerCode.SIGNIFY_NETHERLANDS_B_V) {
             generated.push(new ExtendGenerator({extend: philips.m.light, args, source: "m.light", lib: "philips"}));
         } else {
             generated.push(new ExtendGenerator({extend: m.light, args, source: "light", multiEndpointSkip}));

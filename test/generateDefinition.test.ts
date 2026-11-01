@@ -4,6 +4,7 @@ import {findByDevice, generateExternalDefinitionSource} from "../src";
 import * as fz from "../src/converters/fromZigbee";
 import {repInterval} from "../src/lib/constants";
 import * as philips from "../src/lib/philips";
+import type {Zh} from "../src/lib/types";
 import {type AssertDefinitionArgs, assertDefinition, mockDevice, reportingItem} from "./utils";
 
 const assertGeneratedDefinition = async (args: AssertDefinitionArgs & {externalDefinitionSource?: string}) => {
@@ -429,6 +430,21 @@ export default {
 };
             `,
         });
+    });
+
+    test("Philips light removed from the database while reading its attributes", async () => {
+        const device = mockDevice({
+            modelID: "combo",
+            manufacturerID: Zcl.ManufacturerCode.SIGNIFY_NETHERLANDS_B_V,
+            endpoints: [{inputClusters: ["genOnOff", "lightingColorCtrl"], outputClusters: []}],
+        });
+        const endpoint = device.endpoints[0];
+        vi.spyOn(endpoint, "read").mockImplementation(() => {
+            vi.spyOn(endpoint, "getDevice").mockReturnValue(undefined as unknown as Zh.Device);
+            return Promise.resolve({});
+        });
+
+        expect(await generateExternalDefinitionSource(device)).toContain("philips.m.light(");
     });
 
     test("Electricity meter", async () => {
